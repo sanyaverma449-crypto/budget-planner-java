@@ -1,4 +1,3 @@
-// TEST CHANGE 123
 // Budget Planner Project - Developed in Java using MySQL
 package com.budgetplanner;
 
@@ -13,6 +12,7 @@ public class BudgetPlannerGUI extends JFrame {
 
     public BudgetPlannerGUI() {
     	System.out.println("GUI file updated");
+    	JOptionPane.showMessageDialog(null, "Welcome to Budget Planner!");
 
         setTitle("Budget Planner");
         setSize(650, 550);
