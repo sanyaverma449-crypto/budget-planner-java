@@ -6,6 +6,8 @@ import java.awt.*;
 import java.sql.*;
 
 public class BudgetPlannerGUI extends JFrame {
+	
+	double totalExpense = 0;
 
     JTextField incomeField, budgetField, categoryField, amountField;
     JTextArea displayArea;
@@ -113,6 +115,9 @@ public class BudgetPlannerGUI extends JFrame {
 
                 String category = categoryField.getText();
                 double amount = Double.parseDouble(amountField.getText());
+                totalExpense += amount;
+                System.out.println("Total Expense: " + totalExpense);
+                JOptionPane.showMessageDialog(null, "Total Expense: " + totalExpense);
 
                 String query = "INSERT INTO transactions(type, category, amount) VALUES ('Expense', ?, ?)";
                 PreparedStatement pst = conn.prepareStatement(query);
