@@ -1,3 +1,5 @@
+// TEST CHANGE 123
+// Budget Planner Project - Developed in Java using MySQL
 package com.budgetplanner;
 
 import javax.swing.*;
@@ -10,6 +12,7 @@ public class BudgetPlannerGUI extends JFrame {
     JTextArea displayArea;
 
     public BudgetPlannerGUI() {
+    	System.out.println("GUI file updated");
 
         setTitle("Budget Planner");
         setSize(650, 550);
@@ -30,8 +33,8 @@ public class BudgetPlannerGUI extends JFrame {
         JPanel inputPanel = new JPanel(new GridLayout(4, 2, 10, 10));
         inputPanel.setBackground(new Color(30, 30, 30));
 
-        JLabel incomeLabel = new JLabel("Total Income:");
-        JLabel budgetLabel = new JLabel("Set Budget:");
+        JLabel incomeLabel = new JLabel("Enter Total Income:");
+        JLabel budgetLabel = new JLabel("Enter Monthly Budget:");
         JLabel categoryLabel = new JLabel("Category:");
         JLabel amountLabel = new JLabel("Amount:");
 
@@ -39,7 +42,7 @@ public class BudgetPlannerGUI extends JFrame {
         budgetField = new JTextField();
         categoryField = new JTextField();
         amountField = new JTextField();
-
+        
         JLabel[] labels = {incomeLabel, budgetLabel, categoryLabel, amountLabel};
         for (JLabel lbl : labels) {
             lbl.setForeground(Color.WHITE);
@@ -63,7 +66,7 @@ public class BudgetPlannerGUI extends JFrame {
         inputPanel.add(amountField);
 
         // ===== BUTTONS =====
-        JButton addBtn = new JButton("Add Expense");
+        JButton addBtn = new JButton("Save Expense");
         JButton calcBtn = new JButton("Get Budget");
         JButton deleteBtn = new JButton("Clear Data");
 
@@ -178,7 +181,7 @@ public class BudgetPlannerGUI extends JFrame {
             displayArea.append("Total Expenses: ₹" + totalExpense + "\n");
             displayArea.append("Remaining Balance: ₹" + balance + "\n\n");
 
-            displayArea.append("Breakdown:\n");
+            displayArea.append("\nExpense Breakdown:\n");
 
             double maxAmount = 0;
             String maxCategory = "";
@@ -194,6 +197,7 @@ public class BudgetPlannerGUI extends JFrame {
                     maxCategory = category;
                 }
             }
+            
 
             displayArea.append("\n");
 
@@ -223,3 +227,8 @@ public class BudgetPlannerGUI extends JFrame {
         new BudgetPlannerGUI();
     }
 }
+
+
+
+
+
