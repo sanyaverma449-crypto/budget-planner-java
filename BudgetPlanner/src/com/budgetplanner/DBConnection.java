@@ -9,18 +9,19 @@ public class DBConnection {
         Connection conn = null;
 
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
             conn = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/budget_planner",
                 "root",
-                "Sanya123_456."   
+                "your_password"
             );
-
+            System.out.println("Database connected successfully");
         } catch (Exception e) {
+            System.out.println("Database connection failed");
             e.printStackTrace();
         }
-
+        
         return conn;
     }
 }
+
+
