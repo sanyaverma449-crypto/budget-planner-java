@@ -6,178 +6,159 @@ import java.awt.*;
 import java.sql.*;
 
 public class BudgetPlannerGUI extends JFrame {
-	
-	double totalExpense = 0;
 
-    JTextField incomeField, budgetField, categoryField, amountField;
+	JTextField incomeField, budgetField, categoryField, amountField;
     JTextArea displayArea;
 
     public BudgetPlannerGUI() {
-    	System.out.println("GUI file updated");
-    	JOptionPane.showMessageDialog(null, "Welcome to Budget Planner!");
 
         setTitle("Budget Planner");
         setSize(650, 550);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(null);
+        setResizable(false);
+        getContentPane().setBackground(new Color(30, 30, 30));
 
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBackground(new Color(30, 30, 30));
-        panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-
-        // ===== HEADING =====
         JLabel heading = new JLabel("Budget Planner", JLabel.CENTER);
-        heading.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        heading.setBounds(0, 35, 650, 40);
+        heading.setFont(new Font("Segoe UI", Font.BOLD, 24));
         heading.setForeground(new Color(0, 200, 255));
-        panel.add(heading, BorderLayout.NORTH);
+        add(heading);
 
-        // ===== INPUT PANEL =====
-        JPanel inputPanel = new JPanel(new GridLayout(4, 2, 10, 10));
-        inputPanel.setBackground(new Color(30, 30, 30));
+        JLabel incomeLabel = createLabel("Total Income:");
+        incomeLabel.setBounds(10, 90, 160, 25);
+        add(incomeLabel);
 
-        JLabel incomeLabel = new JLabel("Enter Total Income:");
-        JLabel budgetLabel = new JLabel("Enter Monthly Budget:");
-        JLabel categoryLabel = new JLabel("Category:");
-        JLabel amountLabel = new JLabel("Amount:");
+        JLabel budgetLabel = createLabel("Set Budget:");
+        budgetLabel.setBounds(10, 125, 160, 25);
+        add(budgetLabel);
 
-        incomeField = new JTextField();
-        budgetField = new JTextField();
-        categoryField = new JTextField();
-        amountField = new JTextField();
-        
-        JLabel[] labels = {incomeLabel, budgetLabel, categoryLabel, amountLabel};
-        for (JLabel lbl : labels) {
-            lbl.setForeground(Color.WHITE);
-            lbl.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        }
+        JLabel categoryLabel = createLabel("Category:");
+        categoryLabel.setBounds(10, 160, 160, 25);
+        add(categoryLabel);
 
-        JTextField[] fields = {incomeField, budgetField, categoryField, amountField};
-        for (JTextField f : fields) {
-            f.setBackground(new Color(50, 50, 50));
-            f.setForeground(Color.WHITE);
-            f.setCaretColor(Color.WHITE);
-        }
+        JLabel amountLabel = createLabel("Amount:");
+        amountLabel.setBounds(10, 195, 160, 25);
+        add(amountLabel);
 
-        inputPanel.add(incomeLabel);
-        inputPanel.add(incomeField);
-        inputPanel.add(budgetLabel);
-        inputPanel.add(budgetField);
-        inputPanel.add(categoryLabel);
-        inputPanel.add(categoryField);
-        inputPanel.add(amountLabel);
-        inputPanel.add(amountField);
+        incomeField = createField();
+        incomeField.setBounds(330, 85, 300, 25);
+        add(incomeField);
 
-        // ===== BUTTONS =====
-        JButton addBtn = new JButton("Save Expense");
-        JButton calcBtn = new JButton("Get Budget");
-        JButton deleteBtn = new JButton("Clear Data");
+        budgetField = createField();
+        budgetField.setBounds(330, 120, 300, 25);
+        add(budgetField);
 
-        JButton[] buttons = {addBtn, calcBtn, deleteBtn};
-        for (JButton b : buttons) {
-            b.setBackground(new Color(0, 150, 255));
-            b.setForeground(Color.WHITE);
-            b.setFont(new Font("Segoe UI", Font.BOLD, 13));
-            b.setFocusPainted(false);
-        }
+        categoryField = createField();
+        categoryField.setBounds(330, 155, 300, 25);
+        add(categoryField);
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setBackground(new Color(30, 30, 30));
-        buttonPanel.add(addBtn);
-        buttonPanel.add(calcBtn);
-        buttonPanel.add(deleteBtn);
+        amountField = createField();
+        amountField.setBounds(330, 190, 300, 25);
+        add(amountField);
 
-        // ===== OUTPUT =====
+        JButton addBtn = createButton("Add Expense");
+        addBtn.setBounds(150, 245, 120, 32);
+        add(addBtn);
+
+        JButton calcBtn = createButton("Get Budget");
+        calcBtn.setBounds(280, 245, 120, 32);
+        add(calcBtn);
+
+        JButton deleteBtn = createButton("Clear Data");
+        deleteBtn.setBounds(410, 245, 120, 32);
+        add(deleteBtn);
+
         displayArea = new JTextArea();
         displayArea.setEditable(false);
         displayArea.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         displayArea.setBackground(new Color(40, 40, 40));
         displayArea.setForeground(Color.WHITE);
-        displayArea.setLineWrap(true);
+        displayArea.setCaretColor(Color.WHITE);
 
         JScrollPane scroll = new JScrollPane(displayArea);
-        scroll.setPreferredSize(new Dimension(550, 280));
+        scroll.setBounds(10, 290, 620, 220);
+        add(scroll);
 
-        // ===== CENTER PANEL =====
-        JPanel center = new JPanel(new BorderLayout(10, 10));
-        center.setBackground(new Color(30, 30, 30));
-
-        center.add(inputPanel, BorderLayout.NORTH);
-        center.add(buttonPanel, BorderLayout.CENTER);
-        center.add(scroll, BorderLayout.SOUTH);
-
-        panel.add(center, BorderLayout.CENTER);
-        add(panel);
-
-        // ===== ADD EXPENSE =====
-        addBtn.addActionListener(e -> {
-            try {
-                Connection conn = DBConnection.getConnection();
-
-                String category = categoryField.getText();
-                double amount = Double.parseDouble(amountField.getText());
-                totalExpense += amount;
-                System.out.println("Total Expense: " + totalExpense);
-                JOptionPane.showMessageDialog(null, "Total Expense: " + totalExpense);
-
-                String query = "INSERT INTO transactions(type, category, amount) VALUES ('Expense', ?, ?)";
-                PreparedStatement pst = conn.prepareStatement(query);
-                pst.setString(1, category);
-                pst.setDouble(2, amount);
-
-                pst.executeUpdate();
-
-                JOptionPane.showMessageDialog(this, "Expense Added!");
-
-                categoryField.setText("");
-                amountField.setText("");
-
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Enter valid data!");
-            }
-        });
-
-        // ===== CLEAR DATA =====
-        deleteBtn.addActionListener(e -> {
-            try {
-                Connection conn = DBConnection.getConnection();
-
-                String query = "DELETE FROM transactions";
-                PreparedStatement pst = conn.prepareStatement(query);
-                pst.executeUpdate();
-
-                displayArea.setText("");
-                JOptionPane.showMessageDialog(this, "All data cleared!");
-
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error clearing data!");
-            }
-        });
-
-        // ===== GET BUDGET =====
+        addBtn.addActionListener(e -> addExpense());
         calcBtn.addActionListener(e -> generateBudget());
+        deleteBtn.addActionListener(e -> clearData());
 
         setVisible(true);
     }
 
-    // ===== MAIN LOGIC =====
-    public void generateBudget() {
+    private JLabel createLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setForeground(Color.WHITE);
+        label.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        label.setHorizontalAlignment(SwingConstants.LEFT);
+        return label;
+    }
+
+    private JTextField createField() {
+        JTextField field = new JTextField();
+        field.setBackground(new Color(45, 45, 45));
+        field.setForeground(Color.WHITE);
+        field.setCaretColor(Color.WHITE);
+        field.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        return field;
+    }
+
+    private JButton createButton(String text) {
+        JButton button = new JButton(text);
+        button.setBackground(new Color(0, 150, 255));
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
+        return button;
+    }
+
+    public void addExpense() {
         try {
+            String category = categoryField.getText().trim();
+            double amount = Double.parseDouble(amountField.getText().trim());
+
             Connection conn = DBConnection.getConnection();
 
-            double income = Double.parseDouble(incomeField.getText());
-            double budget = Double.parseDouble(budgetField.getText());
+            String query = "INSERT INTO transactions(type, category, amount) VALUES ('Expense', ?, ?)";
+            PreparedStatement pst = conn.prepareStatement(query);
+            pst.setString(1, category);
+            pst.setDouble(2, amount);
+            pst.executeUpdate();
 
-            String totalQuery = "SELECT SUM(amount) FROM transactions WHERE type='Expense'";
-            PreparedStatement pst1 = conn.prepareStatement(totalQuery);
+            JOptionPane.showMessageDialog(this, "Expense added");
+
+            categoryField.setText("");
+            amountField.setText("");
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error adding expense");
+            ex.printStackTrace();
+        }
+    }
+
+    public void generateBudget() {
+        try {
+            double income = Double.parseDouble(incomeField.getText().trim());
+            double budget = Double.parseDouble(budgetField.getText().trim());
+
+            Connection conn = DBConnection.getConnection();
+
+            PreparedStatement pst1 = conn.prepareStatement(
+                    "SELECT SUM(amount) FROM transactions WHERE type='Expense'");
             ResultSet rs1 = pst1.executeQuery();
 
             double totalExpense = 0;
-            if (rs1.next()) totalExpense = rs1.getDouble(1);
+            if (rs1.next()) {
+                totalExpense = rs1.getDouble(1);
+            }
 
             double balance = income - totalExpense;
 
-            String breakdownQuery = "SELECT category, SUM(amount) as total FROM transactions WHERE type='Expense' GROUP BY category";
-            PreparedStatement pst2 = conn.prepareStatement(breakdownQuery);
+            PreparedStatement pst2 = conn.prepareStatement(
+                    "SELECT category, SUM(amount) AS total FROM transactions WHERE type='Expense' GROUP BY category");
             ResultSet rs2 = pst2.executeQuery();
 
             displayArea.setText("");
@@ -186,7 +167,7 @@ public class BudgetPlannerGUI extends JFrame {
             displayArea.append("Total Expenses: ₹" + totalExpense + "\n");
             displayArea.append("Remaining Balance: ₹" + balance + "\n\n");
 
-            displayArea.append("\nExpense Breakdown:\n");
+            displayArea.append("Breakdown:\n");
 
             double maxAmount = 0;
             String maxCategory = "";
@@ -202,7 +183,6 @@ public class BudgetPlannerGUI extends JFrame {
                     maxCategory = category;
                 }
             }
-            
 
             displayArea.append("\n");
 
@@ -224,7 +204,24 @@ public class BudgetPlannerGUI extends JFrame {
             displayArea.append("You can save ₹" + balance);
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Enter valid numbers!");
+            JOptionPane.showMessageDialog(this, "Enter valid numbers");
+            e.printStackTrace();
+        }
+    }
+
+    public void clearData() {
+        try {
+            Connection conn = DBConnection.getConnection();
+
+            PreparedStatement pst = conn.prepareStatement("DELETE FROM transactions");
+            pst.executeUpdate();
+
+            displayArea.setText("");
+            JOptionPane.showMessageDialog(this, "Data cleared");
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error clearing data");
+            ex.printStackTrace();
         }
     }
 
@@ -232,8 +229,3 @@ public class BudgetPlannerGUI extends JFrame {
         new BudgetPlannerGUI();
     }
 }
-
-
-
-
-
